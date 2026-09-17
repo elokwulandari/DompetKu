@@ -5,188 +5,137 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DompetKu Pintar - Inuyasha Edition</title>
   
-  <!-- React 18 & ReactDOM -->
+  <!-- Libraries: React, ReactDOM, Babel, Tailwind, Chart.js, FontAwesome, Google Fonts -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <!-- Babel for JSX -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts: Fredoka & Plus Jakarta Sans -->
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            fredoka: ['Fredoka', 'cursive'],
-          },
           colors: {
             inuyasha: {
-              red: '#ff4b6e',
               purple: '#8b5cf6',
-              deepPurple: '#6d28d9',
-              lightPurple: '#f3e8ff',
+              deepPurple: '#4c1d95',
+              softPurple: '#f3e8ff',
+              indigo: '#6366f1',
               blue: '#3b82f6',
-              skyBlue: '#0ea5e9',
+              sky: '#0ea5e9',
               softBlue: '#e0f2fe',
-              gold: '#fbbf24',
+              red: '#ef4444',
+              amber: '#f59e0b'
             }
           },
+          fontFamily: {
+            cute: ['Fredoka', 'sans-serif'],
+            sans: ['Quicksand', 'sans-serif']
+          },
           boxShadow: {
-            'cute': '0 10px 25px -5px rgba(139, 92, 246, 0.25), 0 8px 10px -6px rgba(59, 130, 246, 0.2)',
-            'cute-hover': '0 20px 30px -10px rgba(139, 92, 246, 0.35), 0 10px 15px -5px rgba(59, 130, 246, 0.3)',
-            'pop': '0 8px 0px 0px rgba(109, 40, 217, 0.2)'
+            cute: '0 8px 25px -5px rgba(139, 92, 246, 0.15), 0 4px 10px -6px rgba(59, 130, 246, 0.1)'
           }
         }
       }
     }
   </script>
+  
   <style>
-    body { 
-      font-family: 'Plus Jakarta Sans', sans-serif; 
-      background: linear-gradient(135deg, #eef2ff 0%, #f3e8ff 50%, #e0f2fe 100%);
-      min-height: 100vh;
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #f0fdf4 0%, #f0f9ff 50%, #faf5ff 100%);
+      background-attachment: fixed;
     }
-    .font-cute { font-family: 'Fredoka', cursive; }
-    .glass-card { background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(12px); }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #f3e8ff; border-radius: 10px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #c084fc; border-radius: 9999px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a855f7; }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-8px) rotate(2deg); }
+    .font-cute {
+      font-family: 'Fredoka', sans-serif;
     }
-    .animate-float { animation: float 3.5s ease-in-out infinite; }
-
-    @keyframes pulse-subtle {
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    @keyframes pulseSubtle {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.03); }
+      50% { transform: scale(1.02); }
     }
-    .animate-pulse-subtle { animation: pulse-subtle 2.5s ease-in-out infinite; }
+    .animate-pulse-subtle {
+      animation: pulseSubtle 3s infinite ease-in-out;
+    }
   </style>
 </head>
-<body class="text-slate-800 antialiased pb-12">
+<body class="text-slate-800 min-h-screen">
   <div id="root"></div>
 
   <script type="text/babel">
     const { useState, useEffect, useMemo, useRef } = React;
 
-    // SVG Illustration: Cute Chibi Inuyasha Mascot
-    const InuyashaChibi = ({ className = "w-24 h-24" }) => (
-      <svg className={className} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Silver Luscious Long Hair Back */}
-        <path d="M40 90C30 120 35 170 50 190C60 170 65 140 65 120Z" fill="#e2e8f0" />
-        <path d="M160 90C170 120 165 170 150 190C140 170 135 140 135 120Z" fill="#e2e8f0" />
-        <path d="M30 70C20 100 25 150 40 180" stroke="#cbd5e1" strokeWidth="4" strokeLinecap="round" />
-        <path d="M170 70C180 100 175 150 160 180" stroke="#cbd5e1" strokeWidth="4" strokeLinecap="round" />
-        
-        {/* Cute Dog Ears */}
-        {/* Left Ear */}
-        <path d="M52 55C42 28 62 10 78 28C74 42 66 52 52 55Z" fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="3" />
-        <path d="M58 48C52 34 64 22 72 32C70 40 65 46 58 48Z" fill="#f43f5e" opacity="0.6" />
-        {/* Right Ear */}
-        <path d="M148 55C158 28 138 10 122 28C126 42 134 52 148 55Z" fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="3" />
-        <path d="M142 48C148 34 136 22 128 32C130 40 135 46 142 48Z" fill="#f43f5e" opacity="0.6" />
+    // Helper to format currency neatly
+    const formatRupiah = (num) => {
+      const val = Number(num) || 0;
+      return 'Rp ' + val.toLocaleString('id-ID');
+    };
 
-        {/* Chibi Head / Face */}
-        <ellipse cx="100" cy="95" rx="52" ry="46" fill="#fff1f2" />
-        <path d="M100 141C128 141 152 121 152 95C152 69 128 49 100 49C72 49 48 69 48 95C48 121 72 141 100 141Z" stroke="#fda4af" strokeWidth="2.5" />
-
-        {/* Silver Hair Front Bangs */}
-        <path d="M50 82C65 85 75 70 82 88C90 68 110 68 118 88C125 70 135 85 150 82C145 60 128 45 100 45C72 45 55 60 50 82Z" fill="#f8fafc" />
-        <path d="M82 88C80 72 65 78 54 80" stroke="#cbd5e1" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M118 88C120 72 135 78 146 80" stroke="#cbd5e1" strokeWidth="2.5" strokeLinecap="round" />
-
-        {/* Cute Golden Anime Eyes */}
-        <ellipse cx="78" cy="96" rx="8" ry="11" fill="#d97706" />
-        <ellipse cx="122" cy="96" rx="8" ry="11" fill="#d97706" />
-        <circle cx="76" cy="92" r="3.5" fill="white" />
-        <circle cx="120" cy="92" r="3.5" fill="white" />
-        <circle cx="80" cy="100" r="1.5" fill="white" />
-        <circle cx="124" cy="100" r="1.5" fill="white" />
-
-        {/* Eyebrows */}
-        <path d="M70 81Q78 77 86 82" stroke="#475569" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M114 82Q122 77 130 81" stroke="#475569" strokeWidth="2.5" strokeLinecap="round" />
-
-        {/* Cute Blush */}
-        <ellipse cx="68" cy="106" rx="7" ry="4" fill="#fb7185" opacity="0.5" />
-        <ellipse cx="132" cy="106" rx="7" ry="4" fill="#fb7185" opacity="0.5" />
-
-        {/* Cute Fang Smile */}
-        <path d="M92 110Q100 118 108 110" stroke="#881337" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-        <path d="M104 110L106 114L108 110" fill="white" stroke="#881337" strokeWidth="1" />
-
-        {/* Red Robe Kimono Body */}
-        <path d="M60 135C50 145 42 170 38 190H162C158 170 150 145 140 135C125 145 75 145 60 135Z" fill="#ff4b6e" />
-        {/* White Inner Collar */}
-        <path d="M85 138L100 158L115 138" stroke="white" strokeWidth="5" strokeLinecap="round" fill="none" />
-        <path d="M82 136L100 162L118 136" stroke="#ff4b6e" strokeWidth="3" fill="none" />
-
-        {/* Kotodama Purple Magatama Beads Necklace */}
-        <circle cx="75" cy="142" r="5" fill="#7c3aed" stroke="#f3e8ff" strokeWidth="1.5" />
-        <circle cx="87" cy="149" r="5" fill="#7c3aed" stroke="#f3e8ff" strokeWidth="1.5" />
-        <circle cx="100" cy="152" r="6" fill="#6d28d9" stroke="#f3e8ff" strokeWidth="1.5" />
-        <circle cx="113" cy="149" r="5" fill="#7c3aed" stroke="#f3e8ff" strokeWidth="1.5" />
-        <circle cx="125" cy="142" r="5" fill="#7c3aed" stroke="#f3e8ff" strokeWidth="1.5" />
-
-        {/* Sparkles / Sacred Jewels around */}
-        <path d="M30 40L33 46L40 49L33 52L30 58L27 52L20 49L27 46Z" fill="#fbbf24" />
-        <path d="M170 35L172 40L178 42L172 44L170 50L168 44L162 42L168 40Z" fill="#a855f7" />
+    // Cute Shikon Jewel SVG Icon
+    const ShikonJewelIcon = () => (
+      <svg className="w-5 h-5 inline-block text-pink-400 drop-shadow animate-pulse" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
       </svg>
     );
 
-    // Cute Shikon Shard / Jewel Icon
-    const ShikonJewelIcon = () => (
-      <span className="inline-block w-5 h-5 bg-gradient-to-tr from-purple-500 via-pink-400 to-sky-300 rounded-full animate-pulse shadow-md border border-white"></span>
+    // Inuyasha Chibi Mascot Avatar
+    const InuyashaAvatar = () => (
+      <div className="relative w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-tr from-inuyasha-deepPurple to-inuyasha-purple rounded-2xl p-1 shadow-md shrink-0 flex items-center justify-center border-2 border-white">
+        <div className="w-full h-full bg-slate-900 rounded-xl overflow-hidden relative flex items-center justify-center">
+          {/* Silver Hair / Dog Ears */}
+          <div className="absolute top-0.5 left-2 text-white text-xs font-bold font-cute">/\</div>
+          <div className="absolute top-0.5 right-2 text-white text-xs font-bold font-cute">/\</div>
+          {/* Cute Face */}
+          <div className="text-xl">🐶</div>
+          {/* Red Robe / Kotodama Beads Overlay */}
+          <div className="absolute bottom-0 inset-x-0 h-3 bg-red-600 flex items-center justify-center text-[8px] text-amber-300 font-bold">
+            ••••••
+          </div>
+        </div>
+      </div>
     );
 
     function App() {
-      // Settings & Config
+      const defaultWallets = ["BNI", "Bank Jatim", "BCA", "SeaBank", "Bank Jatim Junio", "Tunai"];
+
       const [scriptUrl, setScriptUrl] = useState(() => localStorage.getItem('dompetku_script_url') || '');
       const [showSettings, setShowSettings] = useState(false);
       const [hideBalance, setHideBalance] = useState(false);
       const [isLoading, setIsLoading] = useState(false);
       const [toast, setToast] = useState(null);
 
-      // Custom Delete Modal State
+      // Custom Delete Confirmation Modal State
       const [deleteModalTx, setDeleteModalTx] = useState(null);
+      const [isDeleting, setIsDeleting] = useState(false);
 
-      // 5 Rekening Milik Pengguna
-      const defaultWallets = ["BNI", "Bank Jatim", "BCA", "SeaBank", "Bank Jatim Junio"];
-
-      // Categories
-      const categories = [
-        "🍔 Makanan & Minuman",
-        "🛒 Belanja & Kebutuhan",
-        "🚗 Transportasi",
-        "⚡ Tagihan & Utilitas",
-        "🎬 Hiburan & Lifestyle",
-        "📈 Investasi & Tabungan",
-        "💰 Gaji & Pemasukan",
-        "✨ Lain-lain"
-      ];
-
-      // Initial Transactions Data
+      // Initial Default Transactions
       const [transactions, setTransactions] = useState(() => {
         const saved = localStorage.getItem('dompetku_txs');
         if (saved) {
-          try { return JSON.parse(saved); } catch (e) {}
+          try { return JSON.parse(saved); } catch(e) {}
         }
-        const today = new Date().toISOString().split('T')[0];
         return [
-          { id: 'tx_1', date: today, type: 'Pemasukan', wallet: 'BCA', category: '💰 Gaji & Pemasukan', amount: 6500000, notes: 'Gaji Bulanan Inuyasha' },
-          { id: 'tx_2', date: today, type: 'Pengeluaran', wallet: 'BNI', category: '🍔 Makanan & Minuman', amount: 35000, notes: 'Ramen Instan & Dango' },
-          { id: 'tx_3', date: today, type: 'Transfer', wallet: 'BCA ➔ Bank Jatim Junio', category: 'Transfer Saldo', amount: 1000000, notes: 'Tabungan Shikon Jewel' }
+          { id: 'tx_init_1', date: '2026-09-01', type: 'Pemasukan', wallet: 'BNI', category: 'Gaji / Pendapatan', amount: 5000000, notes: 'Gaji Bulanan' },
+          { id: 'tx_init_2', date: '2026-09-02', type: 'Transfer', wallet: 'BNI ➔ SeaBank', category: 'Transfer Saldo', amount: 1500000, notes: 'Tabungan SeaBank' },
+          { id: 'tx_init_3', date: '2026-09-05', type: 'Pemasukan', wallet: 'Bank Jatim Junio', category: 'Gaji / Pendapatan', amount: 500000, notes: 'Uang Saku Junio' },
+          { id: 'tx_init_4', date: '2026-09-10', type: 'Pengeluaran', wallet: 'Tunai', category: 'Makanan & Minuman', amount: 75000, notes: 'Makan Malam Raman' }
         ];
       });
 
@@ -203,17 +152,16 @@
         date: new Date().toISOString().split('T')[0],
         wallet: 'BNI',
         walletTo: 'SeaBank',
-        category: '🍔 Makanan & Minuman',
+        category: 'Makanan & Minuman',
         amount: '',
         notes: ''
       });
 
-      // Chart Canvas Refs
-      const categoryChartRef = useRef(null);
-      const categoryChartInstance = useRef(null);
-      const walletChartRef = useRef(null);
-      const walletChartInstance = useRef(null);
+      // Chart Reference
+      const chartRef = useRef(null);
+      const chartInstance = useRef(null);
 
+      // Save Local Storage
       useEffect(() => {
         localStorage.setItem('dompetku_txs', JSON.stringify(transactions));
       }, [transactions]);
@@ -229,7 +177,7 @@
 
       const syncFromSheets = async () => {
         if (!scriptUrl) {
-          showNotification('⚠️ Masukkan Web App URL Google Apps Script di menu Pengaturan dulu ya!', 'warning');
+          showNotification('⚠️ Masukkan URL Google Apps Script di menu Pengaturan dahulu!', 'warning');
           setShowSettings(true);
           return;
         }
@@ -240,33 +188,35 @@
           const data = await res.json();
           if (data.status === 'success' && Array.isArray(data.transactions)) {
             setTransactions(data.transactions);
-            showNotification('✅ Osu! Data berhasil disinkronkan dari Google Sheets!', 'success');
+            showNotification('✅ Berhasil menyinkronkan data dengan Spreadsheet!', 'success');
           } else {
-            showNotification('❌ Gagal membaca data: ' + (data.message || 'Format respon tidak valid'), 'error');
+            showNotification('❌ Gagal membaca spreadsheet: ' + (data.message || 'Format tidak valid'), 'error');
           }
         } catch (err) {
-          showNotification('❌ Gagal terhubung ke Google Sheets: ' + err.message, 'error');
+          showNotification('❌ Gagal terhubung ke Spreadsheet: ' + err.message, 'error');
         } finally {
           setIsLoading(false);
         }
       };
 
-      const confirmDeleteTransaction = async () => {
+      // Confirm & Delete Transaction
+      const executeDeleteTransaction = async () => {
         if (!deleteModalTx) return;
         const tx = deleteModalTx;
-        setDeleteModalTx(null);
+        setIsDeleting(true);
 
+        // Remove locally
         const previousTxs = [...transactions];
         setTransactions(prev => prev.filter(t => t.id !== tx.id));
 
         if (!scriptUrl) {
-          showNotification('Hapus lokal berhasil! Tambahkan URL Apps Script untuk sinkron ke Sheets.', 'info');
+          showNotification('✅ Transaksi berhasil dihapus dari penyimpanan lokal!', 'success');
+          setIsDeleting(false);
+          setDeleteModalTx(null);
           return;
         }
 
         try {
-          showNotification('⏳ Menghapus transaksi dari Google Sheets...', 'info');
-          
           const payload = JSON.stringify({
             action: 'delete',
             id: tx.id,
@@ -286,45 +236,70 @@
           });
 
           const result = await response.json();
-
           if (result.status === 'success') {
-            showNotification('✅ Transaksi berhasil dihapus dari Google Sheets!', 'success');
+            showNotification('✅ Transaksi BERHASIL DIHAPUS dari Google Sheets!', 'success');
           } else {
             setTransactions(previousTxs);
-            showNotification('❌ Gagal menghapus di Sheets: ' + result.message, 'error');
+            showNotification('❌ Gagal hapus di Sheets: ' + result.message, 'error');
           }
         } catch (err) {
-          console.error('Delete error:', err);
-          showNotification('⚠️ Terhapus secara lokal. Cek izin "Anyone" pada Web App GAS Anda.', 'warning');
+          // Fallback via GET
+          try {
+            const queryParams = new URLSearchParams({
+              action: 'delete',
+              id: tx.id || '',
+              date: tx.date || '',
+              type: tx.type || '',
+              wallet: tx.wallet || '',
+              category: tx.category || '',
+              amount: tx.amount || 0,
+              notes: tx.notes || ''
+            }).toString();
+
+            const fallbackRes = await fetch(`${scriptUrl}?${queryParams}`);
+            const fallbackData = await fallbackRes.json();
+            if (fallbackData.status === 'success') {
+              showNotification('✅ Transaksi BERHASIL DIHAPUS dari Google Sheets!', 'success');
+            } else {
+              setTransactions(previousTxs);
+              showNotification('❌ Gagal hapus dari Spreadsheet', 'error');
+            }
+          } catch (e) {
+            setTransactions(previousTxs);
+            showNotification('❌ Koneksi terblokir. Pastikan Akses Web App "Anyone / Siapa Saja"', 'error');
+          }
+        } finally {
+          setIsDeleting(false);
+          setDeleteModalTx(null);
         }
       };
 
+      // Handle Add Form Submit
       const handleAddSubmit = async (e) => {
         e.preventDefault();
-        const amt = Number(formData.amount);
-        if (!amt || amt <= 0) {
+        const numAmt = Number(formData.amount);
+        if (!numAmt || numAmt <= 0) {
           showNotification('⚠️ Masukkan nominal transaksi yang valid!', 'warning');
-          return;
-        }
-
-        if (modalType === 'Transfer' && formData.wallet === formData.walletTo) {
-          showNotification('⚠️ Rekening asal dan rekening tujuan tidak boleh sama!', 'warning');
           return;
         }
 
         let walletValue = formData.wallet;
         if (modalType === 'Transfer') {
+          if (formData.wallet === formData.walletTo) {
+            showNotification('⚠️ Rekening asal dan tujuan transfer tidak boleh sama!', 'warning');
+            return;
+          }
           walletValue = `${formData.wallet} ➔ ${formData.walletTo}`;
         }
 
         const newTx = {
-          id: 'tx_' + Date.now(),
+          id: 'tx_local_' + Date.now(),
           date: formData.date,
           type: modalType,
           wallet: walletValue,
           category: modalType === 'Transfer' ? 'Transfer Saldo' : formData.category,
-          amount: amt,
-          notes: formData.notes || '-'
+          amount: numAmt,
+          notes: formData.notes
         };
 
         setTransactions(prev => [newTx, ...prev]);
@@ -335,14 +310,15 @@
           date: new Date().toISOString().split('T')[0],
           wallet: 'BNI',
           walletTo: 'SeaBank',
-          category: '🍔 Makanan & Minuman',
+          category: 'Makanan & Minuman',
           amount: '',
           notes: ''
         });
 
+        // Sync Add to Google Sheets
         if (scriptUrl) {
           try {
-            showNotification('⏳ Menyimpan transaksi ke Google Sheets...', 'info');
+            showNotification('⏳ Menyimpan ke Google Sheets & memperbarui Rekap Saldo...', 'info');
             await fetch(scriptUrl, {
               method: 'POST',
               mode: 'cors',
@@ -352,12 +328,12 @@
                 ...newTx
               })
             });
-            showNotification('✅ Transaksi berhasil tersimpan ke Google Sheets!', 'success');
+            showNotification('✅ Transaksi & Rekap Saldo otomatis terbarui di Sheets!', 'success');
           } catch (err) {
-            showNotification('⚠️ Disimpan secara lokal (Gagal terhubung ke Sheets)', 'warning');
+            showNotification('⚠️ Tersimpan lokal, tetapi gagal terhubung ke Sheets', 'warning');
           }
         } else {
-          showNotification('✅ Transaksi berhasil tersimpan secara lokal!', 'success');
+          showNotification('✅ Transaksi disimpan lokal!', 'success');
         }
       };
 
@@ -382,6 +358,7 @@
         return balances;
       }, [transactions]);
 
+      // Overall Totals
       const totalMetrics = useMemo(() => {
         let totalInc = 0;
         let totalExp = 0;
@@ -394,6 +371,7 @@
         return { grandTotal, totalInc, totalExp };
       }, [transactions, walletBalances]);
 
+      // Monthly Metrics
       const monthlyMetrics = useMemo(() => {
         const monthlyMap = {};
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -436,6 +414,7 @@
         });
       }, [transactions]);
 
+      // Filtered Transactions
       const filteredTransactions = useMemo(() => {
         return transactions.filter(tx => {
           const matchWallet = filterWallet === 'Semua' || tx.wallet.includes(filterWallet);
@@ -452,237 +431,194 @@
       }, [transactions, filterWallet, filterType, filterMonth, searchQuery]);
 
       useEffect(() => {
-        // Doughnut Chart: Categories
-        if (categoryChartRef.current) {
-          const categoryTotals = {};
-          transactions.filter(t => t.type === 'Pengeluaran').forEach(tx => {
-            const cat = tx.category || '✨ Lain-lain';
+        if (!chartRef.current) return;
+
+        const categoryTotals = {};
+        transactions.forEach(tx => {
+          if (tx.type === 'Pengeluaran') {
+            const cat = tx.category || 'Lainnya';
             categoryTotals[cat] = (categoryTotals[cat] || 0) + Number(tx.amount);
-          });
-
-          const labels = Object.keys(categoryTotals);
-          const data = Object.values(categoryTotals);
-
-          if (categoryChartInstance.current) {
-            categoryChartInstance.current.destroy();
           }
+        });
 
-          const ctx = categoryChartRef.current.getContext('2d');
-          categoryChartInstance.current = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-              labels: labels.length ? labels : ['Belum Ada Pengeluaran'],
-              datasets: [{
-                data: data.length ? data : [1],
-                backgroundColor: data.length ? [
-                  '#8b5cf6', '#3b82f6', '#ec4899', '#06b6d4', '#f59e0b', '#10b981', '#6366f1', '#a855f7'
-                ] : ['#e2e8f0'],
-                borderWidth: 3,
-                borderColor: '#ffffff'
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { 
-                legend: { position: 'bottom', labels: { font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' } } } 
-              }
-            }
-          });
+        const labels = Object.keys(categoryTotals);
+        const data = Object.values(categoryTotals);
+
+        if (chartInstance.current) {
+          chartInstance.current.destroy();
         }
 
-        // Bar Chart: Account Distribution
-        if (walletChartRef.current) {
-          if (walletChartInstance.current) {
-            walletChartInstance.current.destroy();
-          }
-
-          const ctxW = walletChartRef.current.getContext('2d');
-          walletChartInstance.current = new Chart(ctxW, {
-            type: 'bar',
-            data: {
-              labels: defaultWallets,
-              datasets: [{
-                label: 'Saldo Rekening (Rp)',
-                data: defaultWallets.map(w => walletBalances[w] || 0),
-                backgroundColor: ['#6366f1', '#3b82f6', '#8b5cf6', '#0ea5e9', '#a855f7'],
-                borderRadius: 12,
-                borderWidth: 2,
-                borderColor: '#ffffff'
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: { 
-                y: { beginAtZero: true, grid: { color: '#f3e8ff' } },
-                x: { grid: { display: false } }
+        const ctx = chartRef.current.getContext('2d');
+        chartInstance.current = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels.length ? labels : ['Belum Ada Pengeluaran'],
+            datasets: [{
+              data: data.length ? data : [1],
+              backgroundColor: data.length ? [
+                '#8b5cf6', '#3b82f6', '#0ea5e9', '#ec4899', '#f59e0b', '#10b981', '#6366f1', '#a855f7'
+              ] : ['#e2e8f0'],
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  font: { family: 'Quicksand', size: 11, weight: '600' },
+                  boxWidth: 12,
+                  padding: 12
+                }
               }
-            }
-          });
-        }
+            },
+            cutout: '65%'
+          }
+        });
 
         return () => {
-          if (categoryChartInstance.current) categoryChartInstance.current.destroy();
-          if (walletChartInstance.current) walletChartInstance.current.destroy();
+          if (chartInstance.current) chartInstance.current.destroy();
         };
-      }, [transactions, walletBalances]);
-
-      const formatRupiah = (num) => 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+      }, [transactions]);
 
       return (
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
           
-          {/* Cute Toast Notification */}
+          {/* Floating Toast Notification */}
           {toast && (
-            <div className={`fixed top-5 right-5 z-50 px-5 py-3.5 rounded-2xl shadow-2xl text-white font-cute text-sm flex items-center space-x-3 transition-all animate-bounce ${
-              toast.type === 'error' ? 'bg-rose-500' :
+            <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-2xl shadow-2xl text-white font-semibold text-xs sm:text-sm flex items-center space-x-2.5 transition transform slide-in max-w-sm ${
+              toast.type === 'error' ? 'bg-rose-600' :
               toast.type === 'warning' ? 'bg-amber-500' :
-              toast.type === 'success' ? 'bg-emerald-500' : 'bg-inuyasha-deepPurple'
+              toast.type === 'success' ? 'bg-emerald-600' : 'bg-indigo-900'
             }`}>
-              <i className="fa-solid fa-paw text-lg text-amber-300"></i>
-              <span>{toast.msg}</span>
+              <i className="fa-solid fa-circle-info text-lg"></i>
+              <span className="leading-snug">{toast.msg}</span>
             </div>
           )}
 
-          {/* Header Banner - Inuyasha Cute Theme */}
-          <header className="bg-gradient-to-r from-inuyasha-deepPurple via-indigo-600 to-inuyasha-blue text-white rounded-[2.5rem] p-6 shadow-cute relative overflow-hidden mb-8 border-4 border-white/40">
-            {/* Background Decorative Stars/Sakura */}
-            <div className="absolute top-2 right-12 opacity-20 text-4xl animate-spin" style={{ animationDuration: '15s' }}>🌸</div>
-            <div className="absolute bottom-1 left-1/3 opacity-20 text-3xl animate-bounce">✨</div>
+          {/* Top Cute Header */}
+          <header className="bg-white/90 backdrop-blur-md rounded-[2rem] p-4 sm:p-6 shadow-cute border-2 border-purple-100 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
             
-            <div className="flex flex-col lg:flex-row justify-between items-center gap-6 relative z-10">
-              
-              {/* Left Side: Logo & Inuyasha Mascot */}
-              <div className="flex items-center space-x-4">
-                <div className="relative animate-float">
-                  <InuyashaChibi className="w-24 h-24 sm:w-28 sm:h-28 drop-shadow-lg" />
-                  <span className="absolute -bottom-1 -right-1 bg-amber-400 text-slate-900 text-[10px] font-cute px-2 py-0.5 rounded-full border-2 border-white font-bold">
-                    Inuyasha 🐾
+            <div className="flex items-center space-x-3.5 w-full md:w-auto">
+              <InuyashaAvatar />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center space-x-2">
+                  <h1 className="text-xl sm:text-2xl font-cute font-bold text-inuyasha-deepPurple tracking-wide truncate">
+                    DompetKu Pintar
+                  </h1>
+                  <span className="bg-purple-100 text-inuyasha-purple text-[10px] font-bold px-2.5 py-0.5 rounded-full font-cute border border-purple-200">
+                    Inuyasha Edition 🐾
                   </span>
                 </div>
-                <div>
-                  <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-cute text-purple-100 mb-1 border border-white/30">
-                    <ShikonJewelIcon />
-                    <span>Asisten Keuangan Inuyasha</span>
-                  </div>
-                  <h1 className="text-2xl sm:text-3xl font-cute font-bold tracking-wide text-white drop-shadow-sm">
-                    DompetKu Pintar ✨
-                  </h1>
-                  <p className="text-xs text-purple-100 font-medium">
-                    Catat 5 Rekening Bank & Sync Google Sheets dengan mudah!
-                  </p>
-                </div>
+                <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
+                  Catat 6 Rekening &amp; Rekap Saldo Otomatis di Google Sheets
+                </p>
               </div>
+            </div>
 
-              {/* Speech Bubble from Inuyasha */}
-              <div className="hidden md:flex bg-white/90 text-inuyasha-deepPurple px-4 py-2.5 rounded-2xl shadow-md border-2 border-purple-300 max-w-xs text-xs font-semibold relative items-center space-x-2 animate-pulse-subtle">
-                <i className="fa-solid fa-comment-dots text-inuyasha-purple text-lg"></i>
-                <span>"Kagome, ayo jaga saldo 5 rekening kita agar tidak defisit!"</span>
-              </div>
+            {/* Speech Bubble from Inuyasha */}
+            <div className="hidden lg:flex bg-gradient-to-r from-purple-50 to-sky-50 text-inuyasha-deepPurple px-4 py-2 rounded-2xl border border-purple-200 text-xs font-semibold items-center space-x-2 animate-pulse-subtle max-w-xs shrink-0">
+              <i className="fa-solid fa-comment-dots text-inuyasha-purple text-base"></i>
+              <span className="leading-tight">"Kagome, rekap saldo bank &amp; tunai kita di Spreadsheet otomatis rapi!"</span>
+            </div>
 
-              {/* Right Side Action Buttons */}
-              <div className="flex flex-wrap items-center gap-2.5">
-                <button 
-                  onClick={syncFromSheets}
-                  disabled={isLoading}
-                  className="bg-emerald-400 hover:bg-emerald-500 text-slate-900 font-cute text-xs sm:text-sm px-4 py-2.5 rounded-2xl font-bold flex items-center space-x-2 transition shadow-pop transform active:translate-y-1 border-2 border-white"
-                >
-                  <i className={`fa-solid fa-rotate ${isLoading ? 'animate-spin' : ''}`}></i>
-                  <span>{isLoading ? 'Syncing...' : 'Sync Sheets'}</span>
-                </button>
+            {/* Header Buttons */}
+            <div className="flex items-center gap-2 w-full md:w-auto justify-end flex-wrap">
+              <button 
+                onClick={syncFromSheets}
+                disabled={isLoading}
+                className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-3.5 py-2 rounded-xl text-xs font-cute font-bold flex items-center space-x-1.5 transition shadow-sm disabled:opacity-50"
+              >
+                <i className={`fa-solid fa-rotate ${isLoading ? 'animate-spin' : ''}`}></i>
+                <span>{isLoading ? 'Sync...' : 'Sync Sheets'}</span>
+              </button>
 
-                <button 
-                  onClick={() => setHideBalance(!hideBalance)}
-                  className="bg-white/20 hover:bg-white/30 text-white font-cute text-xs sm:text-sm px-3.5 py-2.5 rounded-2xl font-bold transition backdrop-blur-md border border-white/30"
-                >
-                  <i className={`fa-solid ${hideBalance ? 'fa-eye-slash' : 'fa-eye'} mr-1.5`}></i>
-                  {hideBalance ? 'Buka Saldo' : 'Tutup Saldo'}
-                </button>
+              <button 
+                onClick={() => setHideBalance(!hideBalance)}
+                className="bg-sky-50 hover:bg-sky-100 text-sky-700 px-3 py-2 rounded-xl text-xs font-cute font-bold transition border border-sky-200"
+              >
+                <i className={`fa-solid ${hideBalance ? 'fa-eye-slash' : 'fa-eye'} mr-1`}></i>
+                {hideBalance ? 'Buka Saldo' : 'Tutup Saldo'}
+              </button>
 
-                <button 
-                  onClick={() => setShowSettings(true)}
-                  className="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-2xl transition backdrop-blur-md border border-white/30"
-                  title="Pengaturan Google Apps Script"
-                >
-                  <i className="fa-solid fa-gear text-lg"></i>
-                </button>
-
-                <button 
-                  onClick={() => setShowAddModal(true)}
-                  className="bg-inuyasha-red hover:bg-rose-600 text-white font-cute font-bold text-xs sm:text-sm px-4 py-2.5 rounded-2xl shadow-pop transition transform active:translate-y-1 flex items-center space-x-2 border-2 border-white"
-                >
-                  <i className="fa-solid fa-plus text-base"></i>
-                  <span>Catat Baru</span>
-                </button>
-              </div>
-
+              <button 
+                onClick={() => setShowSettings(true)}
+                className="bg-purple-50 hover:bg-purple-100 text-inuyasha-purple p-2.5 rounded-xl text-xs font-bold transition border border-purple-200"
+                title="Pengaturan Google Apps Script"
+              >
+                <i className="fa-solid fa-gear text-base"></i>
+              </button>
             </div>
           </header>
 
+          {/* Top Metrics Cards */}
           {}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             
             {/* Card 1: Total Kekayaan */}
-            <div className="bg-gradient-to-br from-inuyasha-purple via-indigo-600 to-inuyasha-blue text-white p-6 rounded-[2rem] shadow-cute relative overflow-hidden border-4 border-white flex flex-col justify-between">
-              <div className="absolute -right-4 -bottom-4 opacity-15 text-8xl">💎</div>
+            <div className="bg-gradient-to-br from-inuyasha-purple via-indigo-600 to-inuyasha-blue text-white p-5 rounded-[2rem] shadow-cute relative overflow-hidden border-2 border-white flex flex-col justify-between">
+              <div className="absolute -right-3 -bottom-3 opacity-15 text-8xl pointer-events-none">💎</div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs font-cute uppercase tracking-wider text-purple-200">Total Kekayaan (5 Bank)</span>
+                  <span className="text-xs font-cute uppercase tracking-wider text-purple-200 font-bold">Total Kekayaan (6 Rekening)</span>
                   <ShikonJewelIcon />
                 </div>
-                <div className="text-3xl font-cute font-bold mt-2 tracking-wide text-amber-300 drop-shadow">
+                <div className="text-2xl sm:text-3xl font-cute font-bold mt-2 tracking-wide text-amber-300 drop-shadow truncate" title={formatRupiah(totalMetrics.grandTotal)}>
                   {hideBalance ? 'Rp •••••••••' : formatRupiah(totalMetrics.grandTotal)}
                 </div>
               </div>
-              <p className="text-[11px] text-purple-100 font-medium mt-4 bg-black/10 px-3 py-1 rounded-full inline-block w-fit">
-                🐾 Gabungan BNI, Jatim, BCA, SeaBank & Junio
+              <p className="text-[11px] text-purple-100 font-medium mt-3 bg-black/10 px-3 py-1 rounded-full inline-block w-fit max-w-full truncate">
+                🐾 Gabungan BNI, Jatim, BCA, SeaBank, Junio &amp; Tunai
               </p>
             </div>
 
             {/* Card 2: Total Pemasukan */}
-            <div className="bg-white p-6 rounded-[2rem] shadow-cute border-4 border-sky-100 flex items-center justify-between hover:scale-[1.02] transition">
-              <div>
-                <span className="text-xs font-cute uppercase tracking-wider text-emerald-600 font-bold block">Total Pemasukan</span>
-                <div className="text-2xl font-cute font-bold text-slate-800 mt-1">
+            <div className="bg-white p-5 rounded-[2rem] shadow-cute border-2 border-sky-100 flex items-center justify-between hover:scale-[1.01] transition gap-2 min-w-0">
+              <div className="min-w-0 flex-1">
+                <span className="text-xs font-cute uppercase tracking-wider text-emerald-600 font-bold block truncate">Total Pemasukan</span>
+                <div className="text-xl sm:text-2xl font-cute font-bold text-slate-800 mt-1 truncate" title={formatRupiah(totalMetrics.totalInc)}>
                   {hideBalance ? 'Rp •••••••••' : formatRupiah(totalMetrics.totalInc)}
                 </div>
-                <span className="text-[11px] text-slate-400 font-medium mt-1 block">Seluruh riwayat transaksi</span>
+                <span className="text-[11px] text-slate-400 font-medium mt-1 block truncate">Seluruh riwayat transaksi</span>
               </div>
-              <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl border-2 border-emerald-200 shadow-sm">
+              <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-xl border border-emerald-200 shadow-sm shrink-0">
                 <i className="fa-solid fa-arrow-down-left"></i>
               </div>
             </div>
 
             {/* Card 3: Total Pengeluaran */}
-            <div className="bg-white p-6 rounded-[2rem] shadow-cute border-4 border-purple-100 flex items-center justify-between hover:scale-[1.02] transition">
-              <div>
-                <span className="text-xs font-cute uppercase tracking-wider text-rose-500 font-bold block">Total Pengeluaran</span>
-                <div className="text-2xl font-cute font-bold text-slate-800 mt-1">
+            <div className="bg-white p-5 rounded-[2rem] shadow-cute border-2 border-purple-100 flex items-center justify-between hover:scale-[1.01] transition gap-2 min-w-0">
+              <div className="min-w-0 flex-1">
+                <span className="text-xs font-cute uppercase tracking-wider text-rose-500 font-bold block truncate">Total Pengeluaran</span>
+                <div className="text-xl sm:text-2xl font-cute font-bold text-slate-800 mt-1 truncate" title={formatRupiah(totalMetrics.totalExp)}>
                   {hideBalance ? 'Rp •••••••••' : formatRupiah(totalMetrics.totalExp)}
                 </div>
-                <span className="text-[11px] text-slate-400 font-medium mt-1 block">Seluruh riwayat transaksi</span>
+                <span className="text-[11px] text-slate-400 font-medium mt-1 block truncate">Seluruh riwayat transaksi</span>
               </div>
-              <div className="w-14 h-14 bg-rose-100 text-rose-500 rounded-2xl flex items-center justify-center text-2xl border-2 border-rose-200 shadow-sm">
+              <div className="w-12 h-12 bg-rose-100 text-rose-500 rounded-2xl flex items-center justify-center text-xl border border-rose-200 shadow-sm shrink-0">
                 <i className="fa-solid fa-arrow-up-right"></i>
               </div>
             </div>
 
           </div>
 
-          {}
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-cute font-bold uppercase tracking-wider text-inuyasha-deepPurple flex items-center gap-2">
-              <i className="fa-solid fa-building-columns text-inuyasha-blue"></i>
-              <span>5 Rekening Bank Saya</span>
+          {/* Section Header for Wallets */}
+          <div className="flex items-center justify-between mb-3 px-1">
+            <h3 className="text-xs font-cute font-bold uppercase tracking-wider text-inuyasha-deepPurple flex items-center gap-1.5">
+              <i className="fa-solid fa-wallet text-inuyasha-blue"></i>
+              <span>6 Rekening Bank &amp; Dompet Tunai Saya</span>
             </h3>
-            <span className="text-xs bg-purple-200 text-inuyasha-deepPurple font-cute font-bold px-3 py-1 rounded-full">
+            <span className="text-xs bg-purple-100 text-inuyasha-deepPurple font-cute font-bold px-3 py-0.5 rounded-full border border-purple-200">
               {defaultWallets.length} Rekening Aktif 🐾
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+          {/* 6 Wallet Balance Cards */}
+          {}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
             {defaultWallets.map((w, idx) => {
               const bal = walletBalances[w] || 0;
               const accountGradients = [
@@ -690,25 +626,31 @@
                 'from-purple-600 to-indigo-500',  // Bank Jatim
                 'from-blue-600 to-sky-500',       // BCA
                 'from-sky-500 to-cyan-500',       // SeaBank
-                'from-violet-600 to-purple-500'   // Bank Jatim Junio
+                'from-violet-600 to-purple-500',  // Bank Jatim Junio
+                'from-emerald-600 to-teal-500'    // Tunai
               ];
               const icons = [
                 'fa-university',
                 'fa-landmark',
                 'fa-credit-card',
                 'fa-mobile-retro',
-                'fa-child-reaching'
+                'fa-child-reaching',
+                'fa-money-bill-wave'
               ];
 
               return (
-                <div key={w} className={`bg-gradient-to-br ${accountGradients[idx % accountGradients.length]} text-white p-5 rounded-[1.8rem] shadow-cute border-2 border-white/50 flex flex-col justify-between hover:-translate-y-1 transition duration-200`}>
-                  <div className="flex items-center justify-between text-white/90 text-xs font-cute">
-                    <span className="font-bold">{w}</span>
-                    <i className={`fa-solid ${icons[idx % icons.length]} text-base text-amber-300`}></i>
+                <div 
+                  key={w} 
+                  className={`bg-gradient-to-br ${accountGradients[idx % accountGradients.length]} text-white p-3.5 rounded-[1.5rem] shadow-cute border border-white/40 flex flex-col justify-between hover:-translate-y-1 transition duration-200 min-w-0 overflow-hidden`}
+                >
+                  <div className="flex items-center justify-between text-white/90 text-xs font-cute gap-1 min-w-0">
+                    <span className="font-bold truncate text-xs block w-full" title={w}>{w}</span>
+                    <i className={`fa-solid ${icons[idx % icons.length]} text-sm text-amber-300 shrink-0`}></i>
                   </div>
-                  <div className="mt-4">
-                    <span className="text-[10px] text-white/80 font-medium block uppercase">Saldo Sekarang</span>
-                    <div className="text-base sm:text-lg font-cute font-bold truncate mt-0.5 text-white">
+
+                  <div className="mt-2.5 min-w-0">
+                    <span className="text-[10px] text-white/80 font-medium block uppercase truncate">Saldo Saat Ini</span>
+                    <div className="text-xs sm:text-sm font-cute font-bold truncate mt-0.5 text-white" title={formatRupiah(bal)}>
                       {hideBalance ? 'Rp •••••••' : formatRupiah(bal)}
                     </div>
                   </div>
@@ -717,49 +659,62 @@
             })}
           </div>
 
+          {/* Monthly Financial Breakdown Cards */}
           {}
-          <div className="bg-white rounded-[2.2rem] p-6 shadow-cute border-4 border-purple-100 mb-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-5">
+          <div className="bg-white/90 rounded-[2rem] p-4 sm:p-5 shadow-cute border-2 border-purple-100 mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
               <div>
-                <h3 className="text-base font-cute font-bold text-slate-800 flex items-center space-x-2">
-                  <i className="fa-solid fa-calendar-heart text-inuyasha-purple text-lg"></i>
+                <h3 className="text-sm sm:text-base font-cute font-bold text-inuyasha-deepPurple flex items-center space-x-2">
+                  <i className="fa-solid fa-calendar-check text-inuyasha-purple"></i>
                   <span>Rekap Keuangan Per Bulan</span>
                 </h3>
-                <p className="text-xs text-slate-400 font-medium">Ringkasan arus kas, surplus, dan defisit bulanan Anda</p>
+                <p className="text-xs text-slate-500 font-medium">Ringkasan total pemasukan, pengeluaran, dan surplus bersih tiap bulan</p>
               </div>
-              <span className="text-xs bg-inuyasha-lightPurple text-inuyasha-deepPurple px-3.5 py-1 rounded-full font-cute font-bold">
+              <span className="text-xs bg-sky-100 text-sky-800 font-cute font-bold px-3 py-1 rounded-full border border-sky-200">
                 {monthlyMetrics.length} Bulan Recorded
               </span>
             </div>
 
             {monthlyMetrics.length === 0 ? (
-              <p className="text-xs text-slate-400 text-center py-6 italic font-medium">Belum ada data bulanan yang tercatat.</p>
+              <p className="text-xs text-slate-400 italic text-center py-4">Belum ada riwayat transaksi bulanan.</p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {monthlyMetrics.map(m => (
-                  <div key={m.ym} className="bg-gradient-to-br from-slate-50 to-purple-50/50 rounded-2xl p-4 border-2 border-purple-100 hover:shadow-md transition">
-                    <div className="flex justify-between items-center pb-2 border-b-2 border-purple-100 mb-3">
-                      <span className="font-cute font-bold text-slate-800 text-sm">{m.label}</span>
-                      <span className={`text-[11px] font-cute font-bold px-3 py-0.5 rounded-full ${
-                        m.net >= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                  <div key={m.ym} className="bg-purple-50/50 rounded-2xl p-3.5 border border-purple-100 hover:shadow-sm transition min-w-0">
+                    <div className="flex justify-between items-center pb-2 border-b border-purple-100 mb-2.5 gap-1">
+                      <span className="font-cute font-bold text-slate-800 text-xs sm:text-sm truncate" title={m.label}>{m.label}</span>
+                      <span className={`text-[10px] font-cute font-bold px-2.5 py-0.5 rounded-full shrink-0 ${
+                        m.net >= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700'
                       }`}>
-                        {m.net >= 0 ? 'Surplus 🎉' : 'Defisit ⚠️'}
+                        {m.net >= 0 ? 'Surplus' : 'Defisit'}
                       </span>
                     </div>
 
-                    <div className="space-y-1.5 text-xs font-medium">
-                      <div className="flex justify-between text-slate-600">
-                        <span>Pemasukan:</span>
-                        <span className="font-bold text-emerald-600">{hideBalance ? '••••••' : formatRupiah(m.income)}</span>
+                    <div className="space-y-1.5 text-xs">
+                      <div className="flex justify-between items-center min-w-0">
+                        <span className="text-slate-500 flex items-center text-[11px] truncate mr-1">
+                          <i className="fa-solid fa-arrow-down text-emerald-500 mr-1 shrink-0"></i>
+                          Pemasukan
+                        </span>
+                        <span className="font-cute font-bold text-emerald-600 truncate shrink-0" title={formatRupiah(m.income)}>
+                          {hideBalance ? '••••••' : formatRupiah(m.income)}
+                        </span>
                       </div>
-                      <div className="flex justify-between text-slate-600">
-                        <span>Pengeluaran:</span>
-                        <span className="font-bold text-rose-500">{hideBalance ? '••••••' : formatRupiah(m.expense)}</span>
+
+                      <div className="flex justify-between items-center min-w-0">
+                        <span className="text-slate-500 flex items-center text-[11px] truncate mr-1">
+                          <i className="fa-solid fa-arrow-up text-rose-500 mr-1 shrink-0"></i>
+                          Pengeluaran
+                        </span>
+                        <span className="font-cute font-bold text-rose-500 truncate shrink-0" title={formatRupiah(m.expense)}>
+                          {hideBalance ? '••••••' : formatRupiah(m.expense)}
+                        </span>
                       </div>
-                      <div className="flex justify-between text-slate-800 pt-2 border-t border-purple-200/60 font-cute font-bold">
-                        <span>Net Cashflow:</span>
-                        <span className={m.net >= 0 ? 'text-inuyasha-purple' : 'text-rose-600'}>
-                          {hideBalance ? '••••••' : formatRupiah(m.net)}
+
+                      <div className="pt-2 border-t border-purple-100 flex justify-between items-center font-bold text-slate-800 text-xs min-w-0">
+                        <span className="text-[11px]">Net Cashflow</span>
+                        <span className={`font-cute truncate ${m.net >= 0 ? 'text-emerald-700' : 'text-rose-600'}`} title={formatRupiah(m.net)}>
+                          {hideBalance ? '••••••' : `${m.net >= 0 ? '+' : ''}${formatRupiah(m.net)}`}
                         </span>
                       </div>
                     </div>
@@ -769,231 +724,263 @@
             )}
           </div>
 
+          {/* Main Content Grid: Transactions Table & Donut Chart */}
           {}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="bg-white rounded-[2.2rem] p-6 shadow-cute border-4 border-blue-100">
-              <h3 className="font-cute font-bold text-slate-800 text-sm mb-1 flex items-center gap-2">
-                <i className="fa-solid fa-chart-pie text-inuyasha-blue"></i> Proporsi Kategori Pengeluaran
-              </h3>
-              <p className="text-xs text-slate-400 mb-4">Persentase mana saja pengeluaran terbesarmu</p>
-              <div className="h-60 relative flex items-center justify-center">
-                <canvas ref={categoryChartRef}></canvas>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-[2.2rem] p-6 shadow-cute border-4 border-purple-100">
-              <h3 className="font-cute font-bold text-slate-800 text-sm mb-1 flex items-center gap-2">
-                <i className="fa-solid fa-chart-simple text-inuyasha-purple"></i> Distribusi Saldo 5 Rekening
-              </h3>
-              <p className="text-xs text-slate-400 mb-4">Perbandingan saldo BNI, Bank Jatim, BCA, SeaBank, & Junio</p>
-              <div className="h-60 relative">
-                <canvas ref={walletChartRef}></canvas>
-              </div>
-            </div>
-          </div>
-
-          {}
-          <div className="bg-white rounded-[2.2rem] p-6 shadow-cute border-4 border-purple-100">
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-5">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* Left 2-Cols: Transaction History Table */}
+            <div className="lg:col-span-2 bg-white/90 rounded-[2rem] p-4 sm:p-6 shadow-cute border-2 border-purple-100 flex flex-col justify-between">
+              
               <div>
-                <h3 className="font-cute font-bold text-slate-800 text-lg flex items-center gap-2">
-                  <i className="fa-solid fa-list-check text-inuyasha-deepPurple"></i>
-                  <span>Riwayat Transaksi Keuangan</span>
-                </h3>
-                <p className="text-xs text-slate-400 font-medium">Total {filteredTransactions.length} transaksi ditampilkan</p>
-              </div>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                  <div>
+                    <h2 className="text-base sm:text-lg font-cute font-bold text-inuyasha-deepPurple flex items-center gap-2">
+                      <i className="fa-solid fa-receipt text-inuyasha-purple"></i>
+                      <span>Riwayat Transaksi</span>
+                    </h2>
+                    <p className="text-xs text-slate-500 font-medium">
+                      {filteredTransactions.length} dari {transactions.length} total transaksi
+                    </p>
+                  </div>
 
-              {/* Filters */}
-              <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                <input 
-                  type="text" 
-                  placeholder="Cari catatan/kategori..." 
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="px-3.5 py-2 border-2 border-purple-100 rounded-2xl text-xs font-semibold focus:outline-none focus:border-inuyasha-purple w-full sm:w-auto"
-                />
+                  {/* Add Action Buttons */}
+                  <div className="flex flex-wrap gap-1.5 w-full sm:w-auto">
+                    <button 
+                      onClick={() => { setModalType('Pengeluaran'); setShowAddModal(true); }}
+                      className="flex-1 sm:flex-none bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded-xl text-xs font-cute font-bold shadow-sm transition flex items-center justify-center space-x-1"
+                    >
+                      <i className="fa-solid fa-minus-circle"></i>
+                      <span>Pengeluaran</span>
+                    </button>
 
-                <select 
-                  value={filterWallet} 
-                  onChange={e => setFilterWallet(e.target.value)}
-                  className="px-3.5 py-2 border-2 border-purple-100 rounded-2xl text-xs font-cute font-bold text-slate-700 bg-white focus:outline-none focus:border-inuyasha-purple"
-                >
-                  <option value="Semua">Semua Rekening</option>
-                  {defaultWallets.map(w => <option key={w} value={w}>{w}</option>)}
-                </select>
+                    <button 
+                      onClick={() => { setModalType('Pemasukan'); setShowAddModal(true); }}
+                      className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-cute font-bold shadow-sm transition flex items-center justify-center space-x-1"
+                    >
+                      <i className="fa-solid fa-plus-circle"></i>
+                      <span>Pemasukan</span>
+                    </button>
 
-                <select 
-                  value={filterType} 
-                  onChange={e => setFilterType(e.target.value)}
-                  className="px-3.5 py-2 border-2 border-purple-100 rounded-2xl text-xs font-cute font-bold text-slate-700 bg-white focus:outline-none focus:border-inuyasha-purple"
-                >
-                  <option value="Semua">Semua Jenis</option>
-                  <option value="Pemasukan">Pemasukan</option>
-                  <option value="Pengeluaran">Pengeluaran</option>
-                  <option value="Transfer">Transfer</option>
-                </select>
-              </div>
-            </div>
+                    <button 
+                      onClick={() => { setModalType('Transfer'); setShowAddModal(true); }}
+                      className="flex-1 sm:flex-none bg-inuyasha-purple hover:bg-inuyasha-deepPurple text-white px-3 py-1.5 rounded-xl text-xs font-cute font-bold shadow-sm transition flex items-center justify-center space-x-1"
+                    >
+                      <i className="fa-solid fa-right-left"></i>
+                      <span>Transfer</span>
+                    </button>
+                  </div>
+                </div>
 
-            {/* Table */}
-            <div className="overflow-x-auto max-h-96 custom-scrollbar rounded-2xl border-2 border-purple-50">
-              <table className="w-full text-left text-xs sm:text-sm">
-                <thead className="bg-gradient-to-r from-purple-100 via-blue-100 to-purple-100 text-inuyasha-deepPurple font-cute font-bold sticky top-0 z-10">
-                  <tr>
-                    <th className="p-3.5 rounded-l-xl">Tanggal</th>
-                    <th className="p-3.5">Rekening</th>
-                    <th className="p-3.5">Kategori</th>
-                    <th className="p-3.5">Catatan</th>
-                    <th className="p-3.5">Jenis</th>
-                    <th className="p-3.5 text-right">Nominal</th>
-                    <th className="p-3.5 text-center rounded-r-xl">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-purple-50 font-medium">
-                  {filteredTransactions.length === 0 ? (
-                    <tr>
-                      <td colSpan="7" className="p-8 text-center text-slate-400 italic">
-                        Tidak ada transaksi yang cocok dengan pencarianmu 🐾
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredTransactions.map(tx => (
-                      <tr key={tx.id} className="hover:bg-purple-50/50 transition">
-                        <td className="p-3.5 text-slate-500 whitespace-nowrap font-mono text-xs">{tx.date}</td>
-                        <td className="p-3.5 font-cute font-bold text-slate-800">{tx.wallet}</td>
-                        <td className="p-3.5 text-slate-700">{tx.category}</td>
-                        <td className="p-3.5 text-slate-500 italic max-w-xs truncate">{tx.notes}</td>
-                        <td className="p-3.5">
-                          <span className={`px-2.5 py-1 rounded-full font-cute font-bold text-[10px] ${
-                            tx.type === 'Pemasukan' ? 'bg-emerald-100 text-emerald-800' :
-                            tx.type === 'Pengeluaran' ? 'bg-rose-100 text-rose-700' : 'bg-purple-100 text-purple-800'
-                          }`}>
-                            {tx.type}
-                          </span>
-                        </td>
-                        <td className={`p-3.5 text-right font-cute font-bold ${
-                          tx.type === 'Pemasukan' ? 'text-emerald-600' :
-                          tx.type === 'Pengeluaran' ? 'text-rose-500' : 'text-inuyasha-purple'
-                        }`}>
-                          {hideBalance ? '••••••' : formatRupiah(tx.amount)}
-                        </td>
-                        <td className="p-3.5 text-center">
-                          <button 
-                            onClick={() => setDeleteModalTx(tx)}
-                            className="text-rose-400 hover:text-rose-600 p-2 transition rounded-xl hover:bg-rose-50"
-                            title="Hapus Transaksi"
-                          >
-                            <i className="fa-solid fa-trash-can"></i>
-                          </button>
-                        </td>
+                {/* Filter Controls */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                  <select 
+                    value={filterMonth} 
+                    onChange={(e) => setFilterMonth(e.target.value)}
+                    className="bg-purple-50/60 border border-purple-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  >
+                    <option value="Semua">Semua Bulan</option>
+                    {monthlyMetrics.map(m => <option key={m.ym} value={m.ym}>{m.label}</option>)}
+                  </select>
+
+                  <select 
+                    value={filterWallet} 
+                    onChange={(e) => setFilterWallet(e.target.value)}
+                    className="bg-purple-50/60 border border-purple-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  >
+                    <option value="Semua">Semua Rekening</option>
+                    {defaultWallets.map(w => <option key={w} value={w}>{w}</option>)}
+                  </select>
+
+                  <select 
+                    value={filterType} 
+                    onChange={(e) => setFilterType(e.target.value)}
+                    className="bg-purple-50/60 border border-purple-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  >
+                    <option value="Semua">Semua Tipe</option>
+                    <option value="Pemasukan">Pemasukan</option>
+                    <option value="Pengeluaran">Pengeluaran</option>
+                    <option value="Transfer">Transfer</option>
+                  </select>
+
+                  <input 
+                    type="text"
+                    placeholder="Cari transaksi..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-purple-50/60 border border-purple-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  />
+                </div>
+
+                {/* Responsive Transactions Table */}
+                <div className="overflow-x-auto rounded-2xl border border-purple-100 custom-scrollbar">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-purple-100/70 text-inuyasha-deepPurple font-cute font-bold uppercase text-[10px] tracking-wider">
+                      <tr>
+                        <th className="p-3">Tanggal</th>
+                        <th className="p-3">Rekening</th>
+                        <th className="p-3">Kategori</th>
+                        <th className="p-3">Catatan</th>
+                        <th className="p-3">Tipe</th>
+                        <th className="p-3 text-right">Jumlah</th>
+                        <th className="p-3 text-center">Hapus</th>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    </thead>
+                    <tbody className="divide-y divide-purple-50 font-medium">
+                      {filteredTransactions.length === 0 ? (
+                        <tr>
+                          <td colSpan="7" className="p-8 text-center text-slate-400 italic">
+                            Tidak ada transaksi yang cocok dengan pencarianmu 🐾
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredTransactions.map(tx => (
+                          <tr key={tx.id} className="hover:bg-purple-50/50 transition">
+                            <td className="p-3 text-slate-500 whitespace-nowrap font-mono text-[11px]">{tx.date}</td>
+                            <td className="p-3 font-cute font-bold text-slate-800 max-w-[110px] truncate" title={tx.wallet}>{tx.wallet}</td>
+                            <td className="p-3 text-slate-700 max-w-[130px] truncate" title={tx.category}>{tx.category}</td>
+                            <td className="p-3 text-slate-500 italic max-w-[150px] truncate" title={tx.notes}>{tx.notes || '-'}</td>
+                            <td className="p-3 whitespace-nowrap">
+                              <span className={`px-2 py-0.5 rounded-full font-cute font-bold text-[10px] ${
+                                tx.type === 'Pemasukan' ? 'bg-emerald-100 text-emerald-800' :
+                                tx.type === 'Pengeluaran' ? 'bg-rose-100 text-rose-700' : 'bg-purple-100 text-purple-800'
+                              }`}>
+                                {tx.type}
+                              </span>
+                            </td>
+                            <td className={`p-3 text-right font-cute font-bold whitespace-nowrap ${
+                              tx.type === 'Pemasukan' ? 'text-emerald-600' :
+                              tx.type === 'Pengeluaran' ? 'text-rose-500' : 'text-inuyasha-purple'
+                            }`} title={formatRupiah(tx.amount)}>
+                              {hideBalance ? '••••••' : formatRupiah(tx.amount)}
+                            </td>
+                            <td className="p-3 text-center whitespace-nowrap">
+                              <button 
+                                onClick={() => setDeleteModalTx(tx)}
+                                className="text-rose-400 hover:text-rose-600 p-1.5 transition rounded-lg hover:bg-rose-50"
+                                title="Hapus Transaksi"
+                              >
+                                <i className="fa-solid fa-trash-can"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
             </div>
+
+            {/* Right 1-Col: Category Analytics Donut Chart */}
+            <div className="bg-white/90 rounded-[2rem] p-4 sm:p-5 shadow-cute border-2 border-purple-100 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-cute font-bold text-inuyasha-deepPurple text-sm sm:text-base flex items-center gap-1.5">
+                    <i className="fa-solid fa-chart-pie text-inuyasha-purple"></i>
+                    <span>Pengeluaran Kategori</span>
+                  </h3>
+                  <span className="text-[10px] font-cute font-bold bg-purple-100 text-inuyasha-purple px-2 py-0.5 rounded-full">
+                    Visualisasi 🐾
+                  </span>
+                </div>
+
+                <div className="relative h-60 w-full flex items-center justify-center">
+                  <canvas ref={chartRef}></canvas>
+                </div>
+              </div>
+
+              {/* Cute Financial Tip Box */}
+              <div className="mt-4 p-3.5 bg-gradient-to-r from-purple-50 to-sky-50 rounded-2xl border border-purple-100 text-xs text-inuyasha-deepPurple space-y-1">
+                <div className="font-cute font-bold flex items-center gap-1.5 text-inuyasha-purple">
+                  <span>🐕</span>
+                  <span>Tips Keuangan Inuyasha:</span>
+                </div>
+                <p className="text-[11px] leading-relaxed text-slate-600">
+                  "Jaga pengeluaran rutinmu di bawah 50% dari pemasukan agar tabungan di SeaBank &amp; Bank Jatim Junio terus berkembang!"
+                </p>
+              </div>
+            </div>
+
           </div>
 
+          {/* Modal 1: Add / Transfer Transaction */}
           {}
-          {/* MODAL 1: ADD TRANSACTION */}
           {showAddModal && (
-            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-[2.5rem] max-w-md w-full p-6 shadow-2xl border-4 border-purple-200">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-cute font-bold text-lg text-slate-800 flex items-center gap-2">
+            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+              <div className="bg-white rounded-[2rem] max-w-md w-full p-5 sm:p-6 shadow-2xl border-4 border-purple-200 max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-4 pb-2 border-b border-purple-100">
+                  <h3 className="text-base sm:text-lg font-cute font-bold text-inuyasha-deepPurple flex items-center gap-2">
                     <i className="fa-solid fa-pen-to-square text-inuyasha-purple"></i>
-                    <span>Catat Transaksi Baru</span>
+                    <span>Tambah {modalType}</span>
                   </h3>
-                  <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600 text-lg">
-                    <i className="fa-solid fa-xmark"></i>
+                  <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600 p-1">
+                    <i className="fa-solid fa-xmark text-lg"></i>
                   </button>
                 </div>
 
-                <form onSubmit={handleAddSubmit} className="space-y-4">
-                  {/* Type Selector */}
+                <form onSubmit={handleAddSubmit} className="space-y-3.5 text-xs">
                   <div>
-                    <label className="block text-xs font-cute font-bold text-slate-600 mb-1.5">Jenis Transaksi</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      <button 
-                        type="button" 
-                        onClick={() => setModalType('Pengeluaran')}
-                        className={`py-2 rounded-xl text-xs font-cute font-bold transition border-2 ${
-                          modalType === 'Pengeluaran' ? 'bg-rose-500 text-white border-rose-500 shadow-sm' : 'bg-slate-100 text-slate-600 border-slate-200'
-                        }`}
-                      >
-                        Pengeluaran
-                      </button>
-
-                      <button 
-                        type="button" 
-                        onClick={() => setModalType('Pemasukan')}
-                        className={`py-2 rounded-xl text-xs font-cute font-bold transition border-2 ${
-                          modalType === 'Pemasukan' ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm' : 'bg-slate-100 text-slate-600 border-slate-200'
-                        }`}
-                      >
-                        Pemasukan
-                      </button>
-
-                      <button 
-                        type="button" 
-                        onClick={() => setModalType('Transfer')}
-                        className={`py-2 rounded-xl text-xs font-cute font-bold transition border-2 ${
-                          modalType === 'Transfer' ? 'bg-inuyasha-purple text-white border-inuyasha-purple shadow-sm' : 'bg-slate-100 text-slate-600 border-slate-200'
-                        }`}
-                      >
-                        Transfer
-                      </button>
-                    </div>
+                    <label className="block font-cute font-bold text-slate-700 mb-1">Tanggal Transaksi</label>
+                    <input 
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({...formData, date: e.target.value})}
+                      required
+                      className="w-full border border-purple-200 rounded-xl p-2.5 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                    />
                   </div>
 
-                  {/* Nominal Input */}
-                  <div>
-                    <label className="block text-xs font-cute font-bold text-slate-600 mb-1">Nominal (Rp)</label>
-                    <div className="relative">
-                      <span className="absolute left-3.5 top-2.5 font-cute font-bold text-slate-400 text-sm">Rp</span>
-                      <input 
-                        type="number" 
-                        required 
-                        min="1" 
-                        placeholder="0" 
-                        value={formData.amount}
-                        onChange={e => setFormData({...formData, amount: e.target.value})}
-                        className="w-full pl-10 pr-3.5 py-2.5 rounded-2xl border-2 border-purple-100 focus:outline-none focus:border-inuyasha-purple font-cute font-bold text-slate-800 text-base"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Wallet Selector */}
                   {modalType !== 'Transfer' ? (
-                    <div>
-                      <label className="block text-xs font-cute font-bold text-slate-600 mb-1">Rekening</label>
-                      <select 
-                        value={formData.wallet}
-                        onChange={e => setFormData({...formData, wallet: e.target.value})}
-                        className="w-full p-2.5 rounded-2xl border-2 border-purple-100 text-xs font-cute font-bold text-slate-700 bg-white focus:outline-none focus:border-inuyasha-purple"
-                      >
-                        {defaultWallets.map(w => <option key={w} value={w}>{w}</option>)}
-                      </select>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-3">
+                    <>
                       <div>
-                        <label className="block text-xs font-cute font-bold text-slate-600 mb-1">Dari Rekening</label>
+                        <label className="block font-cute font-bold text-slate-700 mb-1">Pilih Rekening Bank / Dompet</label>
                         <select 
                           value={formData.wallet}
-                          onChange={e => setFormData({...formData, wallet: e.target.value})}
-                          className="w-full p-2.5 rounded-2xl border-2 border-purple-100 text-xs font-cute font-bold text-slate-700 bg-white focus:outline-none focus:border-inuyasha-purple"
+                          onChange={(e) => setFormData({...formData, wallet: e.target.value})}
+                          className="w-full border border-purple-200 rounded-xl p-2.5 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-purple-400 focus:outline-none"
                         >
                           {defaultWallets.map(w => <option key={w} value={w}>{w}</option>)}
                         </select>
                       </div>
 
                       <div>
-                        <label className="block text-xs font-cute font-bold text-slate-600 mb-1">Ke Rekening</label>
+                        <label className="block font-cute font-bold text-slate-700 mb-1">Kategori Transaksi</label>
+                        <select 
+                          value={formData.category}
+                          onChange={(e) => setFormData({...formData, category: e.target.value})}
+                          className="w-full border border-purple-200 rounded-xl p-2.5 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                        >
+                          <option value="Makanan & Minuman">Makanan & Minuman</option>
+                          <option value="Gaji / Pendapatan">Gaji / Pendapatan</option>
+                          <option value="Transportasi">Transportasi</option>
+                          <option value="Belanja">Belanja</option>
+                          <option value="Tagihan & Utilitas">Tagihan & Utilitas</option>
+                          <option value="Hiburan & Hobi">Hiburan & Hobi</option>
+                          <option value="Kesehatan & Perawatan">Kesehatan & Perawatan</option>
+                          <option value="Lainnya">Lainnya</option>
+                        </select>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block font-cute font-bold text-slate-700 mb-1">Dari Rekening</label>
+                        <select 
+                          value={formData.wallet}
+                          onChange={(e) => setFormData({...formData, wallet: e.target.value})}
+                          className="w-full border border-purple-200 rounded-xl p-2.5 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                        >
+                          {defaultWallets.map(w => <option key={w} value={w}>{w}</option>)}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block font-cute font-bold text-slate-700 mb-1">Ke Rekening</label>
                         <select 
                           value={formData.walletTo}
-                          onChange={e => setFormData({...formData, walletTo: e.target.value})}
-                          className="w-full p-2.5 rounded-2xl border-2 border-purple-100 text-xs font-cute font-bold text-slate-700 bg-white focus:outline-none focus:border-inuyasha-purple"
+                          onChange={(e) => setFormData({...formData, walletTo: e.target.value})}
+                          className="w-full border border-purple-200 rounded-xl p-2.5 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-purple-400 focus:outline-none"
                         >
                           {defaultWallets.map(w => <option key={w} value={w}>{w}</option>)}
                         </select>
@@ -1001,156 +988,183 @@
                     </div>
                   )}
 
-                  {/* Category & Date */}
-                  <div className="grid grid-cols-2 gap-3">
-                    {modalType !== 'Transfer' && (
-                      <div>
-                        <label className="block text-xs font-cute font-bold text-slate-600 mb-1">Kategori</label>
-                        <select 
-                          value={formData.category}
-                          onChange={e => setFormData({...formData, category: e.target.value})}
-                          className="w-full p-2.5 rounded-2xl border-2 border-purple-100 text-xs font-cute font-bold text-slate-700 bg-white focus:outline-none focus:border-inuyasha-purple"
-                        >
-                          {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                        </select>
-                      </div>
-                    )}
-
-                    <div className={modalType === 'Transfer' ? 'col-span-2' : ''}>
-                      <label className="block text-xs font-cute font-bold text-slate-600 mb-1">Tanggal</label>
-                      <input 
-                        type="date" 
-                        required 
-                        value={formData.date}
-                        onChange={e => setFormData({...formData, date: e.target.value})}
-                        className="w-full p-2 rounded-2xl border-2 border-purple-100 text-xs font-cute font-bold text-slate-700 bg-white focus:outline-none focus:border-inuyasha-purple"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Notes */}
                   <div>
-                    <label className="block text-xs font-cute font-bold text-slate-600 mb-1">Catatan (Opsional)</label>
+                    <label className="block font-cute font-bold text-slate-700 mb-1">Nominal (Rp)</label>
                     <input 
-                      type="text" 
-                      placeholder="Contoh: Beli Ramen Kagome" 
-                      value={formData.notes}
-                      onChange={e => setFormData({...formData, notes: e.target.value})}
-                      className="w-full p-2.5 rounded-2xl border-2 border-purple-100 text-xs font-medium text-slate-700 focus:outline-none focus:border-inuyasha-purple"
+                      type="number"
+                      placeholder="Contoh: 100000"
+                      value={formData.amount}
+                      onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                      required
+                      min="1"
+                      className="w-full border border-purple-200 rounded-xl p-2.5 text-xs text-slate-800 font-bold focus:ring-2 focus:ring-purple-400 focus:outline-none"
                     />
                   </div>
 
-                  {/* Submit Button */}
-                  <button type="submit" className="w-full bg-inuyasha-purple hover:bg-inuyasha-deepPurple text-white font-cute font-bold py-3 rounded-2xl shadow-pop transition flex items-center justify-center gap-2 border-2 border-white">
-                    <i className="fa-solid fa-floppy-disk"></i> Simpan Transaksi
-                  </button>
+                  <div>
+                    <label className="block font-cute font-bold text-slate-700 mb-1">Keterangan / Catatan Singkat</label>
+                    <input 
+                      type="text"
+                      placeholder="Contoh: Bayar ramen, setor Junio..."
+                      value={formData.notes}
+                      onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                      className="w-full border border-purple-200 rounded-xl p-2.5 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="pt-3 flex justify-end space-x-2">
+                    <button 
+                      type="button" 
+                      onClick={() => setShowAddModal(false)}
+                      className="px-4 py-2 rounded-xl text-xs font-cute font-bold text-slate-500 hover:bg-slate-100"
+                    >
+                      Batal
+                    </button>
+                    <button 
+                      type="submit"
+                      className="px-5 py-2 bg-inuyasha-purple hover:bg-inuyasha-deepPurple text-white rounded-xl text-xs font-cute font-bold shadow-md transition"
+                    >
+                      Simpan Transaksi
+                    </button>
+                  </div>
                 </form>
               </div>
             </div>
           )}
 
-          {/* MODAL 2: DELETE CONFIRMATION */}
+          {/* Modal 2: Custom Delete Confirmation */}
+          {}
           {deleteModalTx && (
             <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-[2.5rem] max-w-sm w-full p-6 shadow-2xl border-4 border-rose-100 text-center space-y-4">
-                <div className="w-16 h-16 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto text-2xl border-2 border-rose-200">
-                  <i className="fa-solid fa-trash-arrow-up"></i>
+              <div className="bg-white rounded-[2rem] max-w-sm w-full p-5 sm:p-6 shadow-2xl border-4 border-rose-200 text-center space-y-4">
+                <div className="w-12 h-12 bg-rose-100 text-rose-500 rounded-2xl flex items-center justify-center text-xl mx-auto border border-rose-200">
+                  <i className="fa-solid fa-trash-can"></i>
                 </div>
-                <h3 className="font-cute font-bold text-slate-800 text-base">Hapus Transaksi Ini?</h3>
-                <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                  Yakin mau menghapus transaksi <span className="font-bold text-slate-700">"{deleteModalTx.notes || deleteModalTx.category}"</span> sebesar <span className="font-bold text-rose-500">{formatRupiah(deleteModalTx.amount)}</span>?
-                </p>
+                <div>
+                  <h3 className="text-base font-cute font-bold text-slate-800">Hapus Transaksi Ini?</h3>
+                  <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                    Transaksi <span className="font-bold text-slate-700">"{deleteModalTx.notes || deleteModalTx.category}"</span> sebesar <span className="font-bold text-rose-600">{formatRupiah(deleteModalTx.amount)}</span> akan dihapus.
+                  </p>
+                </div>
                 <div className="flex gap-2 pt-2">
                   <button 
                     onClick={() => setDeleteModalTx(null)}
-                    className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-cute font-bold rounded-2xl transition"
+                    disabled={isDeleting}
+                    className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-cute font-bold transition"
                   >
                     Batal
                   </button>
                   <button 
-                    onClick={confirmDeleteTransaction}
-                    className="flex-1 py-2.5 bg-rose-500 hover:bg-rose-600 text-white text-xs font-cute font-bold rounded-2xl shadow transition"
+                    onClick={executeDeleteTransaction}
+                    disabled={isDeleting}
+                    className="flex-1 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-cute font-bold shadow-md transition flex items-center justify-center space-x-1"
                   >
-                    Ya, Hapus
+                    {isDeleting ? (
+                      <i className="fa-solid fa-spinner animate-spin"></i>
+                    ) : (
+                      <span>Ya, Hapus!</span>
+                    )}
                   </button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* MODAL 3: INTEGRATION SETTINGS */}
+          {/* Modal 3: Settings & Google Apps Script Generator */}
+          {}
           {showSettings && (
-            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-[2.5rem] max-w-lg w-full p-6 shadow-2xl border-4 border-purple-200 space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-cute font-bold text-slate-800 text-lg flex items-center gap-2">
-                    <i className="fa-solid fa-file-csv text-emerald-500"></i> Integrasi Google Sheets
+            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+              <div className="bg-white rounded-[2rem] max-w-xl w-full p-5 sm:p-6 shadow-2xl border-4 border-purple-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+                
+                <div className="flex justify-between items-center mb-4 pb-2 border-b border-purple-100">
+                  <h3 className="text-base sm:text-lg font-cute font-bold text-inuyasha-deepPurple flex items-center gap-2">
+                    <i className="fa-solid fa-sliders text-inuyasha-purple"></i>
+                    <span>Integrasi Google Sheets &amp; Apps Script</span>
                   </h3>
-                  <button onClick={() => setShowSettings(false)} className="text-slate-400 hover:text-slate-600 text-lg">
-                    <i className="fa-solid fa-xmark"></i>
+                  <button onClick={() => setShowSettings(false)} className="text-slate-400 hover:text-slate-600 p-1">
+                    <i className="fa-solid fa-xmark text-lg"></i>
                   </button>
                 </div>
 
-                <div className="space-y-3 text-xs text-slate-600">
-                  <label className="block font-cute font-bold text-slate-700">URL Web App Google Apps Script:</label>
-                  <input 
-                    type="url" 
-                    placeholder="https://script.google.com/macros/s/.../exec"
-                    value={scriptUrl}
-                    onChange={e => setScriptUrl(e.target.value)}
-                    className="w-full p-3 rounded-2xl border-2 border-purple-100 focus:outline-none focus:border-inuyasha-purple font-mono text-[11px]"
-                  />
-                  <p className="text-[11px] text-slate-400 font-medium">URL ini tersimpan di browser lokal Anda secara aman.</p>
-
-                  <div className="bg-purple-50/80 p-3.5 rounded-2xl border-2 border-purple-100 space-y-2">
-                    <span className="font-cute font-bold text-inuyasha-deepPurple block text-xs">Petunjuk Pemasangan Kode Apps Script:</span>
-                    <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-700 font-medium">
-                      <li>Buka Google Sheets baru &amp; pilih menu <b>Ekstensi &gt; Apps Script</b>.</li>
-                      <li>Hapus kode bawaan lalu salin kode di bawah ini.</li>
-                      <li>Klik <b>Deploy &gt; New deployment</b> &gt; Pilih Jenis: <b>Web app</b>.</li>
-                      <li>Atur <i>Who has access</i> menjadi: <b>Anyone (Siapa Saja)</b>.</li>
-                      <li>Salin Web App URL dan paste di kotak input atas.</li>
-                    </ol>
+                <div className="space-y-4 text-xs">
+                  <div>
+                    <label className="block font-cute font-bold text-slate-800 mb-1">
+                      URL Web App Google Apps Script
+                    </label>
+                    <input 
+                      type="url"
+                      placeholder="https://script.google.com/macros/s/.../exec"
+                      value={scriptUrl}
+                      onChange={(e) => setScriptUrl(e.target.value)}
+                      className="w-full border border-purple-200 rounded-xl p-2.5 text-xs font-mono text-slate-800 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                    />
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      Tempelkan URL hasil deployment Web App Google Apps Script Anda di sini.
+                    </p>
                   </div>
 
-                  <div className="bg-slate-900 text-emerald-400 p-3.5 rounded-2xl font-mono text-[10px] overflow-x-auto space-y-1">
-                    <div className="text-purple-300 text-[9px] font-sans font-bold uppercase mb-1">// Kode Google Apps Script (Copypaste ke Sheets):</div>
-                    <pre>{`function doGet(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+                  {/* Code Generator Box */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="font-cute font-bold text-inuyasha-deepPurple">
+                        📋 Kode Google Apps Script (Auto Rekap Saldo 6 Rekening &amp; Bulanan)
+                      </span>
+                      <button 
+                        onClick={() => {
+                          const gasCode = document.getElementById('gas-script-content').innerText;
+                          const el = document.createElement('textarea');
+                          el.value = gasCode;
+                          document.body.appendChild(el);
+                          el.select();
+                          document.execCommand('copy');
+                          document.body.removeChild(el);
+                          showNotification('✅ Kode Apps Script disalin ke clipboard!', 'success');
+                        }}
+                        className="bg-purple-100 hover:bg-purple-200 text-inuyasha-deepPurple font-cute font-bold px-2.5 py-1 rounded-lg transition"
+                      >
+                        <i className="fa-solid fa-copy mr-1"></i> Salin Kode
+                      </button>
+                    </div>
+
+                    <div className="bg-slate-900 text-emerald-400 p-3.5 rounded-2xl font-mono text-[10px] space-y-1 max-w-full overflow-hidden">
+                      <div className="text-purple-300 text-[9px] font-sans font-bold uppercase mb-1">// Kode Google Apps Script Baru:</div>
+                      <pre id="gas-script-content" className="whitespace-pre-wrap break-all max-w-full font-mono overflow-x-auto max-h-52 custom-scrollbar text-[10px] leading-relaxed text-emerald-300">{`function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Transaksi") || ss.getSheets()[0];
   var data = sheet.getDataRange().getValues();
-  var transactions = [];
+  var txs = [];
+  
   for (var i = 1; i < data.length; i++) {
     if (data[i][0]) {
-      transactions.push({
+      txs.push({
         id: data[i][0],
-        date: data[i][1] instanceof Date ? data[i][1].toISOString().split('T')[0] : data[i][1],
+        date: formatDate(data[i][1]),
         type: data[i][2],
         wallet: data[i][3],
         category: data[i][4],
         amount: Number(data[i][5]),
-        notes: data[i][6]
+        notes: data[i][6] || ""
       });
     }
   }
-  return ContentService.createTextOutput(JSON.stringify({ status: 'success', transactions: transactions }))
+  return ContentService.createTextOutput(JSON.stringify({ status: "success", transactions: txs }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Transaksi");
+  if (!sheet) {
+    sheet = ss.insertSheet("Transaksi");
+    sheet.appendRow(["ID", "Tanggal", "Tipe", "Rekening", "Kategori", "Jumlah", "Catatan"]);
+  }
+  
   var contents = JSON.parse(e.postData.contents);
-  if (contents.action === 'delete') {
-    var data = sheet.getDataRange().getValues();
-    for (var i = 1; i < data.length; i++) {
-      if (data[i][0] == contents.id) {
-        sheet.deleteRow(i + 1);
-        return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'Deleted' }))
-          .setMimeType(ContentService.MimeType.JSON);
-      }
-    }
-  } else {
+  var action = contents.action;
+  
+  if (action === "add") {
     sheet.appendRow([
-      contents.id || ('tx_' + new Date().getTime()),
+      contents.id,
       contents.date,
       contents.type,
       contents.wallet,
@@ -1158,18 +1172,96 @@ function doPost(e) {
       contents.amount,
       contents.notes
     ]);
-    return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'Added' }))
-      .setMimeType(ContentService.MimeType.JSON);
+  } else if (action === "delete") {
+    var data = sheet.getDataRange().getValues();
+    for (var i = data.length - 1; i >= 1; i--) {
+      if (data[i][0] == contents.id) {
+        sheet.deleteRow(i + 1);
+        break;
+      }
+    }
   }
+  
+  updateRekapSheet(ss);
+  return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function updateRekapSheet(ss) {
+  var rekapSheet = ss.getSheetByName("Rekap Saldo");
+  if (!rekapSheet) {
+    rekapSheet = ss.insertSheet("Rekap Saldo");
+  } else {
+    rekapSheet.clear();
+  }
+  
+  var txSheet = ss.getSheetByName("Transaksi");
+  if (!txSheet) return;
+  var data = txSheet.getDataRange().getValues();
+  
+  var wallets = ["BNI", "Bank Jatim", "BCA", "SeaBank", "Bank Jatim Junio", "Tunai"];
+  var balances = {};
+  wallets.forEach(function(w) { balances[w] = 0; });
+  
+  for (var i = 1; i < data.length; i++) {
+    var type = data[i][2];
+    var wallet = data[i][3];
+    var amt = Number(data[i][5]) || 0;
+    
+    if (type === "Pemasukan") {
+      if (balances[wallet] !== undefined) balances[wallet] += amt;
+    } else if (type === "Pengeluaran") {
+      if (balances[wallet] !== undefined) balances[wallet] -= amt;
+    } else if (type === "Transfer" && wallet.indexOf("➔") !== -1) {
+      var parts = wallet.split("➔");
+      var fromW = parts[0].trim();
+      var toW = parts[1].trim();
+      if (balances[fromW] !== undefined) balances[fromW] -= amt;
+      if (balances[toW] !== undefined) balances[toW] += amt;
+    }
+  }
+  
+  rekapSheet.appendRow(["REKAP SALDO KESELURUHAN (AUTOMATIC)"]);
+  rekapSheet.appendRow(["Nama Rekening / Dompet", "Saldo Saat Ini (Rp)"]);
+  var grandTotal = 0;
+  wallets.forEach(function(w) {
+    rekapSheet.appendRow([w, balances[w]]);
+    grandTotal += balances[w];
+  });
+  rekapSheet.appendRow(["TOTAL KEKAYAAN BERSIH", grandTotal]);
+}
+
+function formatDate(d) {
+  if (d instanceof Date) {
+    return Utilities.formatDate(d, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  }
+  return d;
 }`}</pre>
+                    </div>
                   </div>
 
-                  <button 
-                    onClick={() => setShowSettings(false)}
-                    className="w-full bg-inuyasha-purple hover:bg-inuyasha-deepPurple text-white font-cute font-bold py-3 rounded-2xl transition shadow-pop"
-                  >
-                    Simpan Pengaturan
-                  </button>
+                  <div className="bg-purple-50 p-3 rounded-2xl border border-purple-100 text-[11px] text-slate-600 space-y-1">
+                    <div className="font-cute font-bold text-inuyasha-deepPurple">📌 Langkah Memasang di Google Spreadsheet:</div>
+                    <ol className="list-decimal pl-4 space-y-0.5">
+                      <li>Buka Google Sheets, klik menu <b>Ekstensi &gt; Apps Script</b>.</li>
+                      <li>Hapus kode bawaan, lalu tempelkan kode di atas.</li>
+                      <li>Klik <b>Deploy &gt; New Deployment</b>. Pilih tipe <b>Web App</b>.</li>
+                      <li>Set <i>Execute as: Me</i> &amp; <i>Who has access: Anyone</i>.</li>
+                      <li>Salin URL Web App dan tempelkan pada kolom di atas!</li>
+                    </ol>
+                  </div>
+
+                  <div className="flex justify-end pt-1">
+                    <button 
+                      onClick={() => {
+                        setShowSettings(false);
+                        showNotification('Pengaturan tersimpan!', 'success');
+                      }}
+                      className="px-5 py-2 bg-inuyasha-purple hover:bg-inuyasha-deepPurple text-white rounded-xl font-cute font-bold shadow-md transition"
+                    >
+                      Selesai &amp; Simpan
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1179,8 +1271,7 @@ function doPost(e) {
       );
     }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
 </body>
 </html>
