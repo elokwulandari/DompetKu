@@ -1107,7 +1107,7 @@
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="font-cute font-bold text-inuyasha-deepPurple">
-                        📋 Kode Google Apps Script (Auto Rekap Saldo 6 Rekening &amp; Bulanan)
+                        📋 Kode Google Apps Script (Auto Sheet Tahun & Rekap Saldo)
                       </span>
                       <button 
                         onClick={() => {
@@ -1127,43 +1127,86 @@
                     </div>
 
                     <div className="bg-slate-900 text-emerald-400 p-3.5 rounded-2xl font-mono text-[10px] space-y-1 max-w-full overflow-hidden">
-                      <div className="text-purple-300 text-[9px] font-sans font-bold uppercase mb-1">// Kode Google Apps Script Baru:</div>
+                      <div className="text-purple-300 text-[9px] font-sans font-bold uppercase mb-1">// Kode Google Apps Script (Multisheet Tahun + Rekap Saldo):</div>
                       <pre id="gas-script-content" className="whitespace-pre-wrap break-all max-w-full font-mono overflow-x-auto max-h-52 custom-scrollbar text-[10px] leading-relaxed text-emerald-300">{`function doGet(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName("Transaksi") || ss.getSheets()[0];
-  var data = sheet.getDataRange().getValues();
+  
+  // Handle fallback delete query parameter
+  if (e && e.parameter && e.parameter.action === "delete" && e.parameter.id) {
+    var deleteId = e.parameter.id;
+    var sheets = ss.getSheets();
+    for (var s = 0; s < sheets.length; s++) {
+      if (sheets[s].getName() === "Rekap Saldo") continue;
+      var data = sheets[s].getDataRange().getValues();
+      for (var i = data.length - 1; i >= 0; i--) {
+        if (String(data[i][0]) === String(deleteId)) {
+          sheets[s].deleteRow(i + 1);
+          break;
+        }
+      }
+    }
+    updateRekapSheet(ss);
+    return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  // Read all transactions across all year sheets (and legacy Sheet1)
+  var sheets = ss.getSheets();
   var txs = [];
   
-  for (var i = 1; i < data.length; i++) {
-    if (data[i][0]) {
-      txs.push({
-        id: data[i][0],
-        date: formatDate(data[i][1]),
-        type: data[i][2],
-        wallet: data[i][3],
-        category: data[i][4],
-        amount: Number(data[i][5]),
-        notes: data[i][6] || ""
-      });
+  for (var s = 0; s < sheets.length; s++) {
+    var sheet = sheets[s];
+    var sheetName = sheet.getName();
+    if (sheetName === "Rekap Saldo") continue;
+    
+    var data = sheet.getDataRange().getValues();
+    if (!data || data.length === 0) continue;
+    
+    var startRow = 0;
+    if (data[0][0] === "ID" || data[0][1] === "Tanggal") {
+      startRow = 1;
+    }
+    
+    for (var i = startRow; i < data.length; i++) {
+      if (data[i][0]) {
+        txs.push({
+          id: String(data[i][0]),
+          date: formatDate(data[i][1]),
+          type: String(data[i][2]),
+          wallet: String(data[i][3]),
+          category: String(data[i][4]),
+          amount: Number(data[i][5]) || 0,
+          notes: data[i][6] ? String(data[i][6]) : ""
+        });
+      }
     }
   }
+  
   return ContentService.createTextOutput(JSON.stringify({ status: "success", transactions: txs }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName("Transaksi");
-  if (!sheet) {
-    sheet = ss.insertSheet("Transaksi");
-    sheet.appendRow(["ID", "Tanggal", "Tipe", "Rekening", "Kategori", "Jumlah", "Catatan"]);
-  }
-  
   var contents = JSON.parse(e.postData.contents);
   var action = contents.action;
   
   if (action === "add") {
-    sheet.appendRow([
+    // Ambil tahun dari tanggal transaksi (contoh: "2026-09-17" -> "2026")
+    var dateStr = contents.date || "";
+    var year = dateStr.substring(0, 4);
+    if (!year || isNaN(year)) {
+      year = new Date().getFullYear().toString();
+    }
+    
+    // Buat atau buka sheet bernama tahun yang bersangkutan
+    var targetSheet = ss.getSheetByName(year);
+    if (!targetSheet) {
+      targetSheet = ss.insertSheet(year);
+      targetSheet.appendRow(["ID", "Tanggal", "Tipe", "Rekening", "Kategori", "Jumlah", "Catatan"]);
+    }
+    
+    targetSheet.appendRow([
       contents.id,
       contents.date,
       contents.type,
@@ -1173,11 +1216,17 @@ function doPost(e) {
       contents.notes
     ]);
   } else if (action === "delete") {
-    var data = sheet.getDataRange().getValues();
-    for (var i = data.length - 1; i >= 1; i--) {
-      if (data[i][0] == contents.id) {
-        sheet.deleteRow(i + 1);
-        break;
+    var sheets = ss.getSheets();
+    for (var s = 0; s < sheets.length; s++) {
+      var sheet = sheets[s];
+      if (sheet.getName() === "Rekap Saldo") continue;
+      
+      var data = sheet.getDataRange().getValues();
+      for (var i = data.length - 1; i >= 0; i--) {
+        if (String(data[i][0]) === String(contents.id)) {
+          sheet.deleteRow(i + 1);
+          break;
+        }
       }
     }
   }
@@ -1195,29 +1244,40 @@ function updateRekapSheet(ss) {
     rekapSheet.clear();
   }
   
-  var txSheet = ss.getSheetByName("Transaksi");
-  if (!txSheet) return;
-  var data = txSheet.getDataRange().getValues();
-  
   var wallets = ["BNI", "Bank Jatim", "BCA", "SeaBank", "Bank Jatim Junio", "Tunai"];
   var balances = {};
   wallets.forEach(function(w) { balances[w] = 0; });
   
-  for (var i = 1; i < data.length; i++) {
-    var type = data[i][2];
-    var wallet = data[i][3];
-    var amt = Number(data[i][5]) || 0;
+  var sheets = ss.getSheets();
+  for (var s = 0; s < sheets.length; s++) {
+    var sheet = sheets[s];
+    if (sheet.getName() === "Rekap Saldo") continue;
     
-    if (type === "Pemasukan") {
-      if (balances[wallet] !== undefined) balances[wallet] += amt;
-    } else if (type === "Pengeluaran") {
-      if (balances[wallet] !== undefined) balances[wallet] -= amt;
-    } else if (type === "Transfer" && wallet.indexOf("➔") !== -1) {
-      var parts = wallet.split("➔");
-      var fromW = parts[0].trim();
-      var toW = parts[1].trim();
-      if (balances[fromW] !== undefined) balances[fromW] -= amt;
-      if (balances[toW] !== undefined) balances[toW] += amt;
+    var data = sheet.getDataRange().getValues();
+    if (!data || data.length === 0) continue;
+    
+    var startRow = 0;
+    if (data[0][0] === "ID" || data[0][1] === "Tanggal") {
+      startRow = 1;
+    }
+    
+    for (var i = startRow; i < data.length; i++) {
+      if (!data[i][0]) continue;
+      var type = String(data[i][2]);
+      var wallet = String(data[i][3]);
+      var amt = Number(data[i][5]) || 0;
+      
+      if (type === "Pemasukan") {
+        if (balances[wallet] !== undefined) balances[wallet] += amt;
+      } else if (type === "Pengeluaran") {
+        if (balances[wallet] !== undefined) balances[wallet] -= amt;
+      } else if (type === "Transfer" && wallet.indexOf("➔") !== -1) {
+        var parts = wallet.split("➔");
+        var fromW = parts[0].trim();
+        var toW = parts[1].trim();
+        if (balances[fromW] !== undefined) balances[fromW] -= amt;
+        if (balances[toW] !== undefined) balances[toW] += amt;
+      }
     }
   }
   
@@ -1235,19 +1295,19 @@ function formatDate(d) {
   if (d instanceof Date) {
     return Utilities.formatDate(d, Session.getScriptTimeZone(), "yyyy-MM-dd");
   }
-  return d;
+  return String(d || "");
 }`}</pre>
                     </div>
                   </div>
 
                   <div className="bg-purple-50 p-3 rounded-2xl border border-purple-100 text-[11px] text-slate-600 space-y-1">
-                    <div className="font-cute font-bold text-inuyasha-deepPurple">📌 Langkah Memasang di Google Spreadsheet:</div>
+                    <div className="font-cute font-bold text-inuyasha-deepPurple">📌 Langkah Memasang &amp; Pembaruan Google Apps Script:</div>
                     <ol className="list-decimal pl-4 space-y-0.5">
-                      <li>Buka Google Sheets, klik menu <b>Ekstensi &gt; Apps Script</b>.</li>
-                      <li>Hapus kode bawaan, lalu tempelkan kode di atas.</li>
-                      <li>Klik <b>Deploy &gt; New Deployment</b>. Pilih tipe <b>Web App</b>.</li>
-                      <li>Set <i>Execute as: Me</i> &amp; <i>Who has access: Anyone</i>.</li>
-                      <li>Salin URL Web App dan tempelkan pada kolom di atas!</li>
+                      <li>Buka Google Spreadsheet Anda, pilih menu <b>Ekstensi &gt; Apps Script</b>.</li>
+                      <li>Hapus seluruh kode lama dan tempelkan (paste) kode baru di atas.</li>
+                      <li>Klik <b>Deploy &gt; New Deployment</b> (Penerapan Baru).</li>
+                      <li>Atur <i>Who has access / Siapa yang memiliki akses</i>: <b>Anyone / Siapa Saja</b>.</li>
+                      <li>Klik <b>Deploy</b>, lalu salin URL Web App dan tempelkan pada kolom di atas!</li>
                     </ol>
                   </div>
 
